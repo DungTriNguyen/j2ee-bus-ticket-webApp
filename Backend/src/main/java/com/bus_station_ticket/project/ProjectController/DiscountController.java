@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bus_station_ticket.project.ProjectConfig.LoggerConfig;
 import com.bus_station_ticket.project.ProjectConfig.ResponseBoolAndMess;
 import com.bus_station_ticket.project.ProjectConfig.ResponseObject;
 import com.bus_station_ticket.project.ProjectDTO.DiscountDTO;
@@ -43,12 +44,14 @@ public class DiscountController implements RestApiSimpleControllerInf<DiscountDT
               // Nếu mảng không rỗng
               if (listDiscountEntities.isEmpty() == false) {
 
-                     responseObject.setStatus("success"); // set status
+                     responseObject.setStatus(MESS_SUCCESS); // set status
                      responseObject.setData(listDiscountEntities); // set data
 
                      responseObject.addMessage("mess", "Successfully retrieved data");
                      responseObject.addMessage("length", listDiscountEntities.size());
                      responseObject.addMessage("info", responseObject.getPathBasicInfor("discounts", "{discountId}"));
+
+                     LoggerConfig.writeInfoLevel(DiscountController.class, "/discounts", "Successfully retrieved data");
 
                      return ResponseEntity.status(HttpStatus.OK).body(responseObject);
 
@@ -57,6 +60,8 @@ public class DiscountController implements RestApiSimpleControllerInf<DiscountDT
               responseObject.setData(listDiscountEntities);
               responseObject.addMessage("mess", "There is no data in the database");
               responseObject.addMessage("length", listDiscountEntities.size());
+
+              LoggerConfig.writeWarningLevel(DiscountController.class, "/discounts", "There is no data in the database");
 
               return ResponseEntity.status(HttpStatus.OK).body(responseObject);
        }
@@ -81,12 +86,17 @@ public class DiscountController implements RestApiSimpleControllerInf<DiscountDT
                      responseObject.addMessage("mess", "Found data with matching discount id");
 
                      responseObject.addMessage("info", responseObject.getPathBasicInfor("discounts", "{discountId}"));
+
+                     LoggerConfig.writeInfoLevel(DiscountController.class, "/discounts/{discountId}", "Found data with matching discount id");
+
                      return ResponseEntity.status(HttpStatus.OK).body(responseObject);
               }
 
               responseObject.setStatus("failure");
               responseObject.setData(discountDTO);
               responseObject.addMessage("mess", "No discount entity found with matching discount id");
+
+              LoggerConfig.writeWarningLevel(DiscountController.class, "/discounts/{discountId}", "No discount entity found with matching discount id");
 
               return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
        }
@@ -102,6 +112,9 @@ public class DiscountController implements RestApiSimpleControllerInf<DiscountDT
                      responseObject.setStatus(MESS_FAILURE);
                      responseObject.addMessage("mess", "Missing path variable value or incorrect path variable value");
                      responseObject.setData(id);
+
+                     LoggerConfig.writeErrorLevel(DiscountController.class, "/discounts/delete/{discountId}", "Missing path variable value or incorrect path variable value");
+
                      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
               }
 
@@ -118,12 +131,17 @@ public class DiscountController implements RestApiSimpleControllerInf<DiscountDT
                      responseObject.addMessage("mess", responseBoolAndMess.getValueMess());
 
                      responseObject.addMessage("info", responseObject.getPathBasicInfor("discounts", "{discountId}"));
+
+                     LoggerConfig.writeErrorLevel(DiscountController.class, "/discounts/delete/{discountId}", responseBoolAndMess.getValueMess());
+
                      return ResponseEntity.status(HttpStatus.OK).body(responseObject);
               }
 
               responseObject.setStatus(MESS_FAILURE);
               responseObject.setData(discountDTO);
               responseObject.addMessage("mess", responseBoolAndMess.getValueMess());
+
+              LoggerConfig.writeWarningLevel(DiscountController.class, "/discounts/delete/{discountId}", responseBoolAndMess.getValueMess());
 
               return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
        }
@@ -139,6 +157,9 @@ public class DiscountController implements RestApiSimpleControllerInf<DiscountDT
                      responseObject.setStatus(MESS_FAILURE);
                      responseObject.addMessage("mess", "Missing path variable value or incorrect path variable value");
                      responseObject.setData(id);
+
+                     LoggerConfig.writeErrorLevel(DiscountController.class, "/discounts/hidden/{discountId}", "Missing path variable value or incorrect path variable value");
+
                      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
               }
 
@@ -154,12 +175,17 @@ public class DiscountController implements RestApiSimpleControllerInf<DiscountDT
                      responseObject.addMessage("mess", responseBoolAndMess.getValueMess());
 
                      responseObject.addMessage("info", responseObject.getPathBasicInfor("discounts", "{discountId}"));
+
+                     LoggerConfig.writeInfoLevel(DiscountController.class, "/discounts/hidden/{discountId}", responseBoolAndMess.getValueMess());
+
                      return ResponseEntity.status(HttpStatus.OK).body(responseObject);
               }
 
               responseObject.setStatus(MESS_FAILURE);
               responseObject.setData(discountDTO);
               responseObject.addMessage("mess", responseBoolAndMess.getValueMess());
+
+              LoggerConfig.writeWarningLevel(DiscountController.class, "/discounts/hidden/{discountId}", responseBoolAndMess.getValueMess());
 
               return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
        }
@@ -178,12 +204,16 @@ public class DiscountController implements RestApiSimpleControllerInf<DiscountDT
 
                      responseObject.addMessage("info", responseObject.getPathBasicInfor("discounts", "{discountId}"));
 
+                     LoggerConfig.writeInfoLevel(DiscountController.class, "/discounts/insert", responseBoolAndMess.getValueMess());
+
                      return ResponseEntity.status(HttpStatus.OK).body(responseObject);
               }
 
               responseObject.setStatus(MESS_FAILURE);
               responseObject.setData(obj);
               responseObject.addMessage("mess", responseBoolAndMess.getValueMess());
+
+              LoggerConfig.writeWarningLevel(DiscountController.class, "/discounts/insert", responseBoolAndMess.getValueMess());
 
               return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
        }
@@ -202,12 +232,16 @@ public class DiscountController implements RestApiSimpleControllerInf<DiscountDT
 
                      responseObject.addMessage("info", responseObject.getPathBasicInfor("discounts", "{discountId}"));
 
+                     LoggerConfig.writeInfoLevel(DiscountController.class, "/discounts/update", responseBoolAndMess.getValueMess());
+
                      return ResponseEntity.status(HttpStatus.OK).body(responseObject);
               }
 
               responseObject.setStatus(MESS_FAILURE);
               responseObject.setData(obj);
               responseObject.addMessage("mess", responseBoolAndMess.getValueMess());
+
+              LoggerConfig.writeWarningLevel(DiscountController.class, "/discounts/update", responseBoolAndMess.getValueMess());
 
               return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
        }

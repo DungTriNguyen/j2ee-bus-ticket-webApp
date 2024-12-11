@@ -1,41 +1,26 @@
 import axios from 'axios';
 
-
-const username = 'user1';
-const password = '123456';
-const token = btoa(`${username}:${password}`);
-
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080',
   timeout: 10000,
-  headers: {
-    'Authorization': `Basic ${token}`, // Add Basic Auth header
-  },
 });
 
-// apiClient.interceptors.request.use(
-//   (config) => {
-//     // Add token or other headers here
-//     const token = localStorage.getItem('authToken');
-//     if (token) {
-//       config.headers.Authorization = `Bearer ${token}`;
-//     }
-//     return config;
-//   },
-//   (error) => {
-//     return Promise.reject(error);
-//   }
-// );
+// Request interceptor to add the JWT token to the Authorization header
+apiClient.interceptors.request.use(
+  (config) => {
+    // Get the JWT token from localStorage
+    const token = localStorage.getItem('jwtToken');
+    
+    // If there's a token, set it in the Authorization header as Bearer token
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
 
-// apiClient.interceptors.response.use(
-//   (response) => response,
-//   (error) => {
-//     // Handle errors (e.g., redirect to login on 401)
-//     if (error.response?.status === 401) {
-//       // Handle unauthorized access
-//     }
-//     return Promise.reject(error);
-//   }
-// );
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 export default apiClient;

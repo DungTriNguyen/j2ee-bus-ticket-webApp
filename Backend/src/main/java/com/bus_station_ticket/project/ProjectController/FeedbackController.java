@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bus_station_ticket.project.ProjectConfig.LoggerConfig;
 import com.bus_station_ticket.project.ProjectConfig.ResponseBoolAndMess;
 import com.bus_station_ticket.project.ProjectConfig.ResponseObject;
 import com.bus_station_ticket.project.ProjectDTO.FeedbackDTO;
@@ -51,6 +52,8 @@ public class FeedbackController implements RestApiSimpleControllerInf<FeedbackDT
                      responseObject.addMessage("length", listFeedbackentities.size());
                      responseObject.addMessage("info", responseObject.getPathBasicInfor("feedbacks", "{feedbackId}"));
 
+                     LoggerConfig.writeInfoLevel(FeedbackController.class, "/feedbacks", "Successfully retrieved data");
+
                      return ResponseEntity.status(HttpStatus.OK).body(responseObject);
 
               }
@@ -58,6 +61,8 @@ public class FeedbackController implements RestApiSimpleControllerInf<FeedbackDT
               responseObject.setData(listFeedbackentities);
               responseObject.addMessage("mess", "There is no data in the database");
               responseObject.addMessage("length", listFeedbackentities.size());
+
+              LoggerConfig.writeWarningLevel(FeedbackController.class, "/feedbacks", "There is no data in the database");
 
               return ResponseEntity.status(HttpStatus.OK).body(responseObject);
        }
@@ -82,12 +87,17 @@ public class FeedbackController implements RestApiSimpleControllerInf<FeedbackDT
                      responseObject.addMessage("mess", "Found data with matching feedback id");
 
                      responseObject.addMessage("info", responseObject.getPathBasicInfor("feedbacks", "{feedbackId}"));
+
+                     LoggerConfig.writeInfoLevel(FeedbackController.class, "/feedbacks/{feedbackId}", "Found data with matching feedback id");
+
                      return ResponseEntity.status(HttpStatus.OK).body(responseObject);
               }
 
               responseObject.setStatus("failure");
               responseObject.setData(feedbackDTO);
               responseObject.addMessage("mess", "No feedback entity found with matching feedback id");
+
+              LoggerConfig.writeWarningLevel(FeedbackController.class, "/feedbacks/{feedbackId}", "No feedback entity found with matching feedback id");
 
               return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
        }
@@ -103,6 +113,9 @@ public class FeedbackController implements RestApiSimpleControllerInf<FeedbackDT
                      responseObject.setStatus(MESS_FAILURE);
                      responseObject.addMessage("mess", "Missing path variable value or incorrect path variable value");
                      responseObject.setData(id);
+
+                     LoggerConfig.writeErrorLevel(FeedbackController.class, "/feedbacks/delete/{feedbackId}", "Missing path variable value or incorrect path variable value");
+
                      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
               }
 
@@ -119,12 +132,17 @@ public class FeedbackController implements RestApiSimpleControllerInf<FeedbackDT
                      responseObject.addMessage("mess", responseBoolAndMess.getValueMess());
 
                      responseObject.addMessage("info", responseObject.getPathBasicInfor("feedbacks", "{feedbackId}"));
+
+                     LoggerConfig.writeInfoLevel(FeedbackController.class, "/feedbacks/delete/{feedbackId}", responseBoolAndMess.getValueMess());
+
                      return ResponseEntity.status(HttpStatus.OK).body(responseObject);
               }
 
               responseObject.setStatus(MESS_FAILURE);
               responseObject.setData(feedbackDTO);
               responseObject.addMessage("mess", responseBoolAndMess.getValueMess());
+
+              LoggerConfig.writeWarningLevel(FeedbackController.class, "/feedbacks/delete/{feedbackId}", responseBoolAndMess.getValueMess());
 
               return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
        }
@@ -140,6 +158,9 @@ public class FeedbackController implements RestApiSimpleControllerInf<FeedbackDT
                      responseObject.setStatus(MESS_FAILURE);
                      responseObject.addMessage("mess", "Missing path variable value or incorrect path variable value");
                      responseObject.setData(id);
+
+                     LoggerConfig.writeErrorLevel(FeedbackController.class, "/feedbacks/hidden/{feedbackId}","Missing path variable value or incorrect path variable value");
+
                      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
               }
 
@@ -155,12 +176,17 @@ public class FeedbackController implements RestApiSimpleControllerInf<FeedbackDT
                      responseObject.addMessage("mess", responseBoolAndMess.getValueMess());
 
                      responseObject.addMessage("info", responseObject.getPathBasicInfor("feedbacks", "{feedbackId}"));
+
+                     LoggerConfig.writeInfoLevel(FeedbackController.class, "/feedbacks/hidden/{feedbackId}",responseBoolAndMess.getValueMess());
+
                      return ResponseEntity.status(HttpStatus.OK).body(responseObject);
               }
 
               responseObject.setStatus(MESS_FAILURE);
               responseObject.setData(feedbackDTO);
               responseObject.addMessage("mess", responseBoolAndMess.getValueMess());
+
+              LoggerConfig.writeWarningLevel(FeedbackController.class, "/feedbacks/hidden/{feedbackId}",responseBoolAndMess.getValueMess());
 
               return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
        }
@@ -179,12 +205,16 @@ public class FeedbackController implements RestApiSimpleControllerInf<FeedbackDT
 
                      responseObject.addMessage("info", responseObject.getPathBasicInfor("feedbacks", "{feedbackId}"));
 
+                     LoggerConfig.writeInfoLevel(FeedbackController.class, "/feedbacks/insert",responseBoolAndMess.getValueMess());
+
                      return ResponseEntity.status(HttpStatus.OK).body(responseObject);
               }
 
               responseObject.setStatus(MESS_FAILURE);
               responseObject.setData(obj);
               responseObject.addMessage("mess", responseBoolAndMess.getValueMess());
+
+              LoggerConfig.writeWarningLevel(FeedbackController.class, "/feedbacks/insert",responseBoolAndMess.getValueMess());
 
               return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
        }
@@ -203,12 +233,16 @@ public class FeedbackController implements RestApiSimpleControllerInf<FeedbackDT
 
                      responseObject.addMessage("info", responseObject.getPathBasicInfor("feedbacks", "{feedbackId}"));
 
+                     LoggerConfig.writeInfoLevel(FeedbackController.class, "/feedbacks/update",responseBoolAndMess.getValueMess());
+
                      return ResponseEntity.status(HttpStatus.OK).body(responseObject);
               }
 
               responseObject.setStatus(MESS_FAILURE);
               responseObject.setData(obj);
               responseObject.addMessage("mess", responseBoolAndMess.getValueMess());
+
+              LoggerConfig.writeWarningLevel(FeedbackController.class, "/feedbacks/update",responseBoolAndMess.getValueMess());
 
               return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
        }

@@ -35,4 +35,7 @@ build/
 
 #### File in Project
 .env
+/.env
 /logs/*
+/Backend/logs/*
+Backend/logs/*

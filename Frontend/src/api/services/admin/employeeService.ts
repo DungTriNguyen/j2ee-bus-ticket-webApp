@@ -11,7 +11,7 @@ export const getEmployees = async (): Promise<Employee[]> => {
   });
 };
 
-export const getEmployeeById = async (employeeId: string): Promise<Employee> => {
+export const getEmployeeById = async (employeeId: number): Promise<Employee> => {
   return apiRequest(async () => {
     const response = await apiClient.get<ApiResponse<Employee>>(`/employees/${employeeId}`);
     return response.data.data!;
@@ -32,14 +32,14 @@ export const updateEmployee = async (employee: Partial<Employee>): Promise<Emplo
   });
 };
 
-export const deleteEmployee = async (employeeId: string): Promise<Employee> => {
+export const deleteEmployee = async (employeeId: number): Promise<Employee> => {
   return apiRequest(async () => {
-    const response = await apiClient.delete<ApiResponse<Employee>>(`/employees/${employeeId}`);
+    const response = await apiClient.delete<ApiResponse<Employee>>(`/employees/delete/${employeeId}`);
     return response.data.data!;
   });
 };
 
-export const hideEmployee = async (employeeId: string): Promise<Employee> => {
+export const hideEmployee = async (employeeId: number): Promise<Employee> => {
   return apiRequest(async () => {
     const response = await apiClient.delete<ApiResponse<Employee>>(`/employees/hidden/${employeeId}`);
     return response.data.data!;

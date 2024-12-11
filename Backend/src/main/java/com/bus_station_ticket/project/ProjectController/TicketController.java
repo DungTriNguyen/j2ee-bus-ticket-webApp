@@ -1,5 +1,6 @@
 package com.bus_station_ticket.project.ProjectController;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,13 +12,17 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bus_station_ticket.project.ProjectConfig.LoggerConfig;
 import com.bus_station_ticket.project.ProjectConfig.ResponseBoolAndMess;
 import com.bus_station_ticket.project.ProjectConfig.ResponseObject;
 import com.bus_station_ticket.project.ProjectDTO.TicketDTO;
+// import com.bus_station_ticket.project.ProjectService.AccountService;
 import com.bus_station_ticket.project.ProjectService.TicketService;
 
+// import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 @RestController
@@ -26,6 +31,9 @@ public class TicketController implements RestApiSimpleControllerInf<TicketDTO, L
 
        @Autowired
        private TicketService ticketService;
+
+       // @Autowired
+       // private AccountService accountService;
 
        @GetMapping
        @Override
@@ -47,6 +55,8 @@ public class TicketController implements RestApiSimpleControllerInf<TicketDTO, L
                      responseObject.addMessage("length", listTicketEntities.size());
                      responseObject.addMessage("info", responseObject.getPathBasicInfor("tickets", "{ticketId}"));
 
+                     LoggerConfig.writeInfoLevel(TicketController.class, "/tickets", "Successfully retrieved data");
+
                      return ResponseEntity.status(HttpStatus.OK).body(responseObject);
 
               }
@@ -54,6 +64,8 @@ public class TicketController implements RestApiSimpleControllerInf<TicketDTO, L
               responseObject.setData(listTicketEntities);
               responseObject.addMessage("mess", "There is no data in the database");
               responseObject.addMessage("length", listTicketEntities.size());
+
+              LoggerConfig.writeWarningLevel(TicketController.class, "/tickets", "There is no data in the database");
 
               return ResponseEntity.status(HttpStatus.OK).body(responseObject);
        }
@@ -78,12 +90,17 @@ public class TicketController implements RestApiSimpleControllerInf<TicketDTO, L
                      responseObject.addMessage("mess", "Found data with matching ticket id");
 
                      responseObject.addMessage("info", responseObject.getPathBasicInfor("tickets", "{ticketId}"));
+
+                     LoggerConfig.writeInfoLevel(TicketController.class, "/tickets/{ticketId}", "Found data with matching ticket id");
+
                      return ResponseEntity.status(HttpStatus.OK).body(responseObject);
               }
 
               responseObject.setStatus("failure");
               responseObject.setData(ticketDTO);
               responseObject.addMessage("mess", "No ticket entity found with matching ticket id");
+
+              LoggerConfig.writeWarningLevel(TicketController.class, "/tickets/{ticketId}", "No ticket entity found with matching ticket id");
 
               return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
        }
@@ -99,6 +116,9 @@ public class TicketController implements RestApiSimpleControllerInf<TicketDTO, L
                      responseObject.setStatus(MESS_FAILURE);
                      responseObject.addMessage("mess", "Missing path variable value or incorrect path variable value");
                      responseObject.setData(id);
+
+                     LoggerConfig.writeErrorLevel(TicketController.class, "/tickets/delete/{ticketId}", "Missing path variable value or incorrect path variable value");
+
                      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
               }
 
@@ -115,12 +135,17 @@ public class TicketController implements RestApiSimpleControllerInf<TicketDTO, L
                      responseObject.addMessage("mess", responseBoolAndMess.getValueMess());
 
                      responseObject.addMessage("info", responseObject.getPathBasicInfor("tickets", "{ticketId}"));
+
+                     LoggerConfig.writeInfoLevel(TicketController.class, "/tickets/delete/{ticketId}", responseBoolAndMess.getValueMess());
+
                      return ResponseEntity.status(HttpStatus.OK).body(responseObject);
               }
 
               responseObject.setStatus(MESS_FAILURE);
               responseObject.setData(ticketDTO);
               responseObject.addMessage("mess", responseBoolAndMess.getValueMess());
+
+              LoggerConfig.writeWarningLevel(TicketController.class, "/tickets/delete/{ticketId}", responseBoolAndMess.getValueMess());
 
               return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
        }
@@ -136,6 +161,9 @@ public class TicketController implements RestApiSimpleControllerInf<TicketDTO, L
                      responseObject.setStatus(MESS_FAILURE);
                      responseObject.addMessage("mess", "Missing path variable value or incorrect path variable value");
                      responseObject.setData(id);
+
+                     LoggerConfig.writeErrorLevel(TicketController.class, "/tickets/hidden/{ticketId}", "Missing path variable value or incorrect path variable value");
+
                      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
               }
 
@@ -151,12 +179,17 @@ public class TicketController implements RestApiSimpleControllerInf<TicketDTO, L
                      responseObject.addMessage("mess", responseBoolAndMess.getValueMess());
 
                      responseObject.addMessage("info", responseObject.getPathBasicInfor("tickets", "{ticketId}"));
+
+                     LoggerConfig.writeInfoLevel(TicketController.class, "/tickets/hidden/{ticketId}", responseBoolAndMess.getValueMess());
+
                      return ResponseEntity.status(HttpStatus.OK).body(responseObject);
               }
 
               responseObject.setStatus(MESS_FAILURE);
               responseObject.setData(ticketDTO);
               responseObject.addMessage("mess", responseBoolAndMess.getValueMess());
+
+              LoggerConfig.writeWarningLevel(TicketController.class, "/tickets/hidden/{ticketId}", responseBoolAndMess.getValueMess());
 
               return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
        }
@@ -175,12 +208,16 @@ public class TicketController implements RestApiSimpleControllerInf<TicketDTO, L
 
                      responseObject.addMessage("info", responseObject.getPathBasicInfor("tickets", "{ticketId}"));
 
+                     LoggerConfig.writeInfoLevel(TicketController.class, "/tickets/insert", responseBoolAndMess.getValueMess());
+
                      return ResponseEntity.status(HttpStatus.OK).body(responseObject);
               }
 
               responseObject.setStatus(MESS_FAILURE);
               responseObject.setData(obj);
               responseObject.addMessage("mess", responseBoolAndMess.getValueMess());
+
+              LoggerConfig.writeWarningLevel(TicketController.class, "/tickets/insert", responseBoolAndMess.getValueMess());
 
               return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
        }
@@ -199,6 +236,8 @@ public class TicketController implements RestApiSimpleControllerInf<TicketDTO, L
 
                      responseObject.addMessage("info", responseObject.getPathBasicInfor("tickets", "{ticketId}"));
 
+                     LoggerConfig.writeInfoLevel(TicketController.class, "/tickets/update", responseBoolAndMess.getValueMess());
+
                      return ResponseEntity.status(HttpStatus.OK).body(responseObject);
               }
 
@@ -206,7 +245,59 @@ public class TicketController implements RestApiSimpleControllerInf<TicketDTO, L
               responseObject.setData(obj);
               responseObject.addMessage("mess", responseBoolAndMess.getValueMess());
 
+              LoggerConfig.writeWarningLevel(TicketController.class, "/tickets/update", responseBoolAndMess.getValueMess());
+
               return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
        }
 
+       // thong ke
+       @GetMapping("/statistics")
+       public ResponseEntity<ResponseObject> getStatisticsTickets(@RequestParam("dateA") LocalDate dateA,
+                     @RequestParam("dateB") LocalDate dateB) {
+
+              ResponseObject responseObject = new ResponseObject();
+
+              if (dateA.isBefore(dateB)) {
+                     responseObject = this.ticketService.statisticTicketRangeDay(dateA, dateB);
+
+                     LoggerConfig.writeInfoLevel(TicketController.class, "/tickets/statistics", MESS_SUCCESS);
+
+                     return ResponseEntity.status(HttpStatus.OK).body(responseObject);
+              }
+
+              responseObject.setStatus(MESS_FAILURE);
+              responseObject.addMessage("mess", "The statistical date entered is incorrect");
+              responseObject.setData(null);
+
+              LoggerConfig.writeWarningLevel(TicketController.class, "/tickets/statistics", "The statistical date entered is incorrect");
+
+              return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
+       }
+
+       @GetMapping("/ticket_by_ticketId_username")
+       public ResponseEntity<ResponseObject> getByTicketIdAndUserName(@RequestParam("ticketId") Long ticketId, @RequestParam("username") String username) {
+
+              ResponseObject responseObject = this.ticketService.getByTicketIdAndUserName(ticketId,username);
+
+              return ResponseEntity.status(HttpStatus.OK).body(responseObject);
+       }
+
+       @GetMapping("/ticket_by_date_username")
+       public ResponseEntity<ResponseObject> getByTicketIdAndUserNameAndDateRange(@RequestParam("username") String username, @RequestParam("dateA") LocalDate dateA, @RequestParam("dateB") LocalDate dateB) {
+
+              ResponseObject responseObject = this.ticketService.getByTicketIdAndUserNameAndDateRange(username, dateA, dateB);
+
+              return ResponseEntity.status(HttpStatus.OK).body(responseObject);
+       }
+
+       @GetMapping("/ticket_full_info/{ticketId}")
+       public ResponseEntity<ResponseObject> getFullInfoTicket (@PathVariable("ticketId") Long ticketId){
+
+              ResponseObject responseObject = this.ticketService.getFullInfoTicket(ticketId);
+
+              if(responseObject.getStatus().equals(MESS_SUCCESS)){
+                     return ResponseEntity.status(HttpStatus.OK).body(responseObject);
+              }
+              return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
+       }
 }

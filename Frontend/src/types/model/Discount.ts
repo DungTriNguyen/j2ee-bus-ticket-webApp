@@ -1,5 +1,5 @@
 export interface Discount {
-  discountId: number;
+  discountId?: number;
   discountPercentage: number;
   validFrom: string;
   validUntil: string;

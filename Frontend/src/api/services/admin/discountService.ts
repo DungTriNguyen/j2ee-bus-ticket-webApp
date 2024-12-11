@@ -11,7 +11,7 @@ export const getDiscounts = async (): Promise<Discount[]> => {
   });
 };
 
-export const getDiscountById = async (discountId: string): Promise<Discount> => {
+export const getDiscountById = async (discountId: number): Promise<Discount> => {
   return apiRequest(async () => {
     const response = await apiClient.get<ApiResponse<Discount>>(`/discounts/${discountId}`);
     return response.data.data!;
@@ -32,14 +32,14 @@ export const updateDiscount = async (discount: Partial<Discount>): Promise<Disco
   });
 };
 
-export const deleteDiscount = async (discountId: string): Promise<Discount> => {
+export const deleteDiscount = async (discountId: number): Promise<Discount> => {
   return apiRequest(async () => {
     const response = await apiClient.delete<ApiResponse<Discount>>(`/discounts/${discountId}`);
     return response.data.data!;
   });
 };
 
-export const hideDiscount = async (discountId: string): Promise<Discount> => {
+export const hideDiscount = async (discountId: number): Promise<Discount> => {
   return apiRequest(async () => {
     const response = await apiClient.delete<ApiResponse<Discount>>(`/discounts/hidden/${discountId}`);
     return response.data.data!;

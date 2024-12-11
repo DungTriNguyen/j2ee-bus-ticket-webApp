@@ -22,7 +22,7 @@ public interface BusRepo extends JpaRepository<BusEntity,Long> {
 
        @Query(
               value = """
-                     select b.bus_id, b.bus_number, b.capacity, b.brand, b.is_delete
+                     select b.bus_id, b.bus_number, b.capacity, b.brand, b.is_delete 
                      from bus b, employee e, bus_employee be
                      where e.driver_id = be.driver_id and be.bus_id = b.bus_id and e.driver_id = :driverId
               """,
@@ -31,26 +31,47 @@ public interface BusRepo extends JpaRepository<BusEntity,Long> {
        )
        public List<BusEntity> findByEmployeeEntity_Id (@Param("driverId") Long driverId);
 
+       // @Query(
+       //        value = """
+       //               select b.bus_id, b.bus_number, b.capacity, b.brand, b.is_delete , b.routes_id
+       //               from bus b, ticket tk
+       //               where b.bus_id = tk.bus_id and tk.ticket_id = :ticketId
+       //        """,
+       //        nativeQuery = true 
+       // )
+       // public Optional<BusEntity> findByTicketEntity_Id (@Param("ticketId") Long ticketId);
+
        @Query(
               value = """
-                     select b.bus_id, b.bus_number, b.capacity, b.brand, b.is_delete
-                     from bus b, ticket tk
-                     where b.bus_id = tk.bus_id and tk.ticket_id = :ticketId
+                     select b.bus_id, b.bus_number, b.capacity, b.brand, b.is_delete 
+                     from bus b, bus_routes_schedule brs
+                     where b.bus_id = brs.bus_id and brs.schedule_id = :scheduleId
               """,
-              nativeQuery = true 
+              nativeQuery = true
        )
-       public Optional<BusEntity> findByTicketEntity_Id (@Param("ticketId") Long ticketId);
+
+       public Optional<BusEntity> findByBusRouteSchedules_Id (@Param("scheduleId") Long scheduleId);
 
 
        @Query(
               value = """
-                     select b.bus_id, b.bus_number, b.capacity, b.brand, b.is_delete
+                     select b.bus_id, b.bus_number, b.capacity, b.brand, b.is_delete 
                      from bus b,  penalty_ticket pt
                      where b.bus_id = pt.bus_id and pt.penalty_ticket_id = :penaltyTicketId
               """,
               nativeQuery = true
 
        )
-       public BusEntity findByPenaltyTicket_Id(@Param("penaltyTicketId") Long penaltyTicketId);
+       public Optional<BusEntity> findByPenaltyTicket_Id(@Param("penaltyTicketId") Long penaltyTicketId);
+
+       // @Query(
+       //        value = """
+       //               select b.bus_id, b.bus_number, b.capacity, b.brand, b.routes_id, b.is_delete
+       //               from bus b, bus_routes br
+       //               where b.routes_id = br.routes_id and br.routes_id = :routesId
+       //        """,
+       //        nativeQuery = true 
+       // )
+       // public List<BusEntity> findByRoutes_Id (@Param("routesId") Long routesId);
 
 }

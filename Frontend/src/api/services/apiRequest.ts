@@ -21,6 +21,6 @@ export const apiRequest = async <T>(request: () => Promise<T>): Promise<T> => {
 const handleError = (error: any): void => {
   const message = error?.response?.data?.message || 'An unexpected error occurred';
   console.error('API Error:', error);
-  toast.error(message); // Show a toast notification
-  throw new Error(message); // Optional, re-throw if necessary
+  toast.error("Thao tác với dữ liệu không thành công. Lỗi vi phạm khóa ngoại hoặc trùng dữ liệu"); // Show a toast notification
+  // throw new Error(message); // Optional, re-throw if necessary
 };

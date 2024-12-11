@@ -9,7 +9,7 @@ import Login from '../pages/user/Login';
 import SignUp from '../pages/user/SignUp';
 import AllRoute from '../pages/user/AllRoute';
 import Ticket from '../pages/user/Ticket';
-import FeedBack from '../pages/user/FeedBack';
+import FeedBack from '../pages/user/Feedback';
 import Contact from '../pages/user/Contact';
 import AboutUs from '../pages/user/AboutUs';
 import AnhBaPay from '../components/user/AnhBaPay';
@@ -24,8 +24,10 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
 import UnAuthorized from '../pages/shared/UnAuthorized';
 
+import ExportTicket from '../pages/user/ExportTicket'
+
 function UserRoute() {
-  const { user } = useSelector((state: RootState) => state.auth);
+  const user  = useSelector((state: RootState) => state.user);
 
   return (
     <>
@@ -42,6 +44,7 @@ function UserRoute() {
           <Route path='/danh-gia-gop-y' element={<FeedBack />} />
           <Route path='/lien-he' element={<Contact />} />
           <Route path='/ve-chung-toi' element={<AboutUs />} />
+          <Route path='/export' element={<ExportTicket />} />
 
           <Route path='/thong-tin' element={<Dashboard />}>
             <Route path='anhba-pay' element={<AnhBaPay />} />

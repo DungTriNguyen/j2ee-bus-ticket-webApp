@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bus_station_ticket.project.ProjectConfig.LoggerConfig;
 import com.bus_station_ticket.project.ProjectConfig.ResponseBoolAndMess;
 import com.bus_station_ticket.project.ProjectConfig.ResponseObject;
 import com.bus_station_ticket.project.ProjectDTO.PaymentDTO;
@@ -50,6 +51,8 @@ public class PaymentController implements RestApiSimpleControllerInf<PaymentDTO,
                      responseObject.addMessage("length", listPaymentEntities.size());
                      responseObject.addMessage("info", responseObject.getPathBasicInfor("payments", "{paymentId}"));
 
+                     LoggerConfig.writeInfoLevel(PaymentController.class, "/payments", "Successfully retrieved data");
+
                      return ResponseEntity.status(HttpStatus.OK).body(responseObject);
 
               }
@@ -57,6 +60,8 @@ public class PaymentController implements RestApiSimpleControllerInf<PaymentDTO,
               responseObject.setData(listPaymentEntities);
               responseObject.addMessage("mess", "There is no data in the database");
               responseObject.addMessage("length", listPaymentEntities.size());
+
+              LoggerConfig.writeWarningLevel(PaymentController.class, "/payments", "There is no data in the database");
 
               return ResponseEntity.status(HttpStatus.OK).body(responseObject);
        }
@@ -81,12 +86,17 @@ public class PaymentController implements RestApiSimpleControllerInf<PaymentDTO,
                      responseObject.addMessage("mess", "Found data with matching payment id");
 
                      responseObject.addMessage("info", responseObject.getPathBasicInfor("payments", "{paymentId}"));
+
+                     LoggerConfig.writeInfoLevel(PaymentController.class, "/payments/{paymentId}", "Found data with matching payment id");
+
                      return ResponseEntity.status(HttpStatus.OK).body(responseObject);
               }
 
               responseObject.setStatus("failure");
               responseObject.setData(paymentDTO);
               responseObject.addMessage("mess", "No payment entity found with matching payment id");
+
+              LoggerConfig.writeWarningLevel(PaymentController.class, "/payments/{paymentId}", "No payment entity found with matching payment id");
 
               return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
        }
@@ -102,6 +112,9 @@ public class PaymentController implements RestApiSimpleControllerInf<PaymentDTO,
                      responseObject.setStatus(MESS_FAILURE);
                      responseObject.addMessage("mess", "Missing path variable value or incorrect path variable value");
                      responseObject.setData(id);
+
+                     LoggerConfig.writeErrorLevel(PaymentController.class, "/payments/delete/{paymentId}", "Missing path variable value or incorrect path variable value");
+
                      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
               }
 
@@ -118,12 +131,17 @@ public class PaymentController implements RestApiSimpleControllerInf<PaymentDTO,
                      responseObject.addMessage("mess", responseBoolAndMess.getValueMess());
 
                      responseObject.addMessage("info", responseObject.getPathBasicInfor("payments", "{paymentId}"));
+
+                     LoggerConfig.writeInfoLevel(PaymentController.class, "/payments/delete/{paymentId}", responseBoolAndMess.getValueMess());
+
                      return ResponseEntity.status(HttpStatus.OK).body(responseObject);
               }
 
               responseObject.setStatus(MESS_FAILURE);
               responseObject.setData(paymentDTO);
               responseObject.addMessage("mess", responseBoolAndMess.getValueMess());
+
+              LoggerConfig.writeWarningLevel(PaymentController.class, "/payments/delete/{paymentId}", responseBoolAndMess.getValueMess());
 
               return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
        }
@@ -139,6 +157,9 @@ public class PaymentController implements RestApiSimpleControllerInf<PaymentDTO,
                      responseObject.setStatus(MESS_FAILURE);
                      responseObject.addMessage("mess", "Missing path variable value or incorrect path variable value");
                      responseObject.setData(id);
+
+                     LoggerConfig.writeErrorLevel(PaymentController.class, "/payments/hidden/{paymentId}", "Missing path variable value or incorrect path variable value");
+
                      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
               }
 
@@ -154,12 +175,17 @@ public class PaymentController implements RestApiSimpleControllerInf<PaymentDTO,
                      responseObject.addMessage("mess", responseBoolAndMess.getValueMess());
 
                      responseObject.addMessage("info", responseObject.getPathBasicInfor("payments", "{paymentId}"));
+
+                     LoggerConfig.writeInfoLevel(PaymentController.class, "/payments/hidden/{paymentId}", responseBoolAndMess.getValueMess());
+
                      return ResponseEntity.status(HttpStatus.OK).body(responseObject);
               }
 
               responseObject.setStatus(MESS_FAILURE);
               responseObject.setData(paymentDTO);
               responseObject.addMessage("mess", responseBoolAndMess.getValueMess());
+
+              LoggerConfig.writeWarningLevel(PaymentController.class, "/payments/hidden/{paymentId}", responseBoolAndMess.getValueMess());
 
               return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
        }
@@ -178,12 +204,16 @@ public class PaymentController implements RestApiSimpleControllerInf<PaymentDTO,
 
                      responseObject.addMessage("info", responseObject.getPathBasicInfor("payments", "{paymentId}"));
 
+                     LoggerConfig.writeInfoLevel(PaymentController.class, "/payments/insert", responseBoolAndMess.getValueMess());
+
                      return ResponseEntity.status(HttpStatus.OK).body(responseObject);
               }
 
               responseObject.setStatus(MESS_FAILURE);
               responseObject.setData(obj);
               responseObject.addMessage("mess", responseBoolAndMess.getValueMess());
+
+              LoggerConfig.writeWarningLevel(PaymentController.class, "/payments/insert", responseBoolAndMess.getValueMess());
 
               return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
        }
@@ -202,12 +232,16 @@ public class PaymentController implements RestApiSimpleControllerInf<PaymentDTO,
 
                      responseObject.addMessage("info", responseObject.getPathBasicInfor("payments", "{paymentId}"));
 
+                     LoggerConfig.writeInfoLevel(PaymentController.class, "/payments/update", responseBoolAndMess.getValueMess());
+
                      return ResponseEntity.status(HttpStatus.OK).body(responseObject);
               }
 
               responseObject.setStatus(MESS_FAILURE);
               responseObject.setData(obj);
               responseObject.addMessage("mess", responseBoolAndMess.getValueMess());
+
+              LoggerConfig.writeWarningLevel(PaymentController.class, "/payments/update", responseBoolAndMess.getValueMess());
 
               return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
        }

@@ -7,11 +7,12 @@ import { Bus } from '@type/model/Bus';
 export const getBuses = async (): Promise<Bus[]> => {
   return apiRequest(async () => {
     const response = await apiClient.get<ApiResponse<Bus[]>>('/buses');
+    // console.log("response api bus: ",response.data.data);
     return response.data.data || [];
   });
 };
 
-export const getBusById = async (busId: string): Promise<Bus> => {
+export const getBusById = async (busId: number): Promise<Bus> => {
   return apiRequest(async () => {
     const response = await apiClient.get<ApiResponse<Bus>>(`/buses/${busId}`);
     return response.data.data!;
@@ -32,14 +33,14 @@ export const updateBus = async (bus: Partial<Bus>): Promise<Bus> => {
   });
 };
 
-export const deleteBus = async (busId: string): Promise<Bus> => {
+export const deleteBus = async (busId: number): Promise<Bus> => {
   return apiRequest(async () => {
-    const response = await apiClient.delete<ApiResponse<Bus>>(`/buses/${busId}`);
+    const response = await apiClient.delete<ApiResponse<Bus>>(`/buses/delete/${busId}`);
     return response.data.data!;
   });
 };
 
-export const hideBus = async (busId: string): Promise<Bus> => {
+export const hideBus = async (busId: number): Promise<Bus> => {
   return apiRequest(async () => {
     const response = await apiClient.delete<ApiResponse<Bus>>(`/buses/hidden/${busId}`);
     return response.data.data!;

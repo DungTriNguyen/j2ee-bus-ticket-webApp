@@ -34,7 +34,7 @@ public class  AccountEntity {
                                                                                     // null: no
        private String phoneNumber;
 
-       @Column(name = "ROLE", nullable = false, columnDefinition = "ENUM('ROLE_USER','ROLE_ADMIN') DEFAULT 'ROLE_USER'") // column:
+       @Column(name = "ROLE", nullable = false, columnDefinition = "ENUM('ROLE_USER','ROLE_ADMIN','ROLE_MANAGER', 'ROLE_STAFF') DEFAULT 'ROLE_USER'") // column:
                                                                                                           // ROLE, type:
                                                                                                           // nvarchar
                                                                                                           // (USER,ADMIN),

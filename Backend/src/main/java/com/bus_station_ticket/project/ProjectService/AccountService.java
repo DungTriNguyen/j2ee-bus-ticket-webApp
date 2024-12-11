@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.bus_station_ticket.project.ProjectConfig.ResponseBoolAndMess;
+import com.bus_station_ticket.project.ProjectConfig.ResponseObject;
 import com.bus_station_ticket.project.ProjectDTO.AccountDTO;
 import com.bus_station_ticket.project.ProjectEntity.AccountEntity;
 import com.bus_station_ticket.project.ProjectEntity.FeedbackEntity;
@@ -25,6 +26,7 @@ import com.bus_station_ticket.project.ProjectRepository.FeedbackRepo;
 import com.bus_station_ticket.project.ProjectRepository.TicketRepo;
 import com.bus_station_ticket.project.ProjectSecurity.JwtService;
 import com.bus_station_ticket.project.ProjectSecurity.UserDetailsConfig;
+
 
 @Service
 public class AccountService implements SimpleServiceInf<AccountEntity, AccountDTO, String> {
@@ -152,11 +154,15 @@ public class AccountService implements SimpleServiceInf<AccountEntity, AccountDT
 
               // Nếu kết quả có
               if (optionalAccount.isPresent() && isForeignKeyEmpty(accountEnity) == false) {
-                     // Mã hóa mật khẩu trước khi thêm vào csdl
-                     AccountEntity accountEntityEncode = encodePassWord(accountEnity);
+                     // kiem tra xem nguoi dung co cap nhat pass khong
+                     if (isPassWordUpdate(accountEnity) && foreignKeyViolationIfHidden(accountEnity) == false) {
+                            // Mã hóa mật khẩu mới trước khi thêm vào csdl
+                            AccountEntity accountEntityEncode = encodePassWord(accountEnity);
 
-                     // sửa AccountEntity vào
-                     this.repo.save(accountEntityEncode);
+                            this.repo.save(accountEntityEncode);
+                            return new ResponseBoolAndMess(true, MESS_UPDATE_SUCCESS);
+                     }
+                     this.repo.save(accountEnity);
 
                      return new ResponseBoolAndMess(true, MESS_UPDATE_SUCCESS);
               }
@@ -191,7 +197,7 @@ public class AccountService implements SimpleServiceInf<AccountEntity, AccountDT
                      // kiem tra khoa ngoai trước khi xóa
                      Boolean checkForeignKey = foreignKeyViolationIfDelete(optionalAccount.get());
 
-                     if (checkForeignKey) {
+                     if (checkForeignKey == false) {
                             // Xóa
                             this.repo.delete(optionalAccount.get());
                             return new ResponseBoolAndMess(true, MESS_DELETE_SUCCESS);
@@ -213,7 +219,7 @@ public class AccountService implements SimpleServiceInf<AccountEntity, AccountDT
                      // kiem tra khoa ngoai truoc khi an
                      Boolean checkForeignKey = foreignKeyViolationIfHidden(optional.get());
 
-                     if (checkForeignKey) {
+                     if (checkForeignKey == false) {
                             AccountEntity accountEntity = optional.get();
                             accountEntity.setIsDelete(true);
                             // cap nhat lai
@@ -232,19 +238,20 @@ public class AccountService implements SimpleServiceInf<AccountEntity, AccountDT
        public Boolean foreignKeyViolationIfDelete(AccountEntity entityObj) {
 
               // Accounnt foreign key Feedback and Ticket
-
               // lấy những đối tượng ticket và feedback tham chiếu khóa ngoại đến account
-              List<TicketEntity> ticketEntities = this.ticketRepo.findByAccountEntity_userName(entityObj.getUserName());
+              List<TicketEntity> ticketEntities = this.ticketRepo
+                            .findByAccountEntity_userName(entityObj.getUserName());
 
               List<FeedbackEntity> feedbackEntities = this.feedbackRepo
                             .findByAccountEntity_userName(entityObj.getUserName());
 
               // kiểm tra
               // Nếu có thực thể tham chiếu khóa ngoại
-              if (ticketEntities.isEmpty() == false && feedbackEntities.isEmpty() == false) {
+              if (ticketEntities.isEmpty() == true && feedbackEntities.isEmpty() == true) {
                      return false;
               }
               return true;
+
        }
 
        @Transactional
@@ -253,30 +260,36 @@ public class AccountService implements SimpleServiceInf<AccountEntity, AccountDT
 
               // Accounnt foreign key Feedback and Ticket
 
-              // lấy những đối tượng ticket và feedback tham chiếu khóa ngoại đến account
-              List<TicketEntity> ticketEntities = this.ticketRepo.findByAccountEntity_userName(entityObj.getUserName());
+              if (entityObj.getIsDelete()) {
+                     // lấy những đối tượng ticket và feedback tham chiếu khóa ngoại đến account
+                     List<TicketEntity> ticketEntities = this.ticketRepo
+                                   .findByAccountEntity_userName(entityObj.getUserName());
 
-              List<FeedbackEntity> feedbackEntities = this.feedbackRepo
-                            .findByAccountEntity_userName(entityObj.getUserName());
+                     List<FeedbackEntity> feedbackEntities = this.feedbackRepo
+                                   .findByAccountEntity_userName(entityObj.getUserName());
 
-              // kiểm tra
-              // Nếu có thực thể tham chiếu khóa ngoại
-              if (ticketEntities.isEmpty() == false && feedbackEntities.isEmpty() == false) {
+                     // kiểm tra
+                     // Nếu có thực thể tham chiếu khóa ngoại
+                     if (ticketEntities.isEmpty() == false) {
 
-                     for (FeedbackEntity feedbackEntity : feedbackEntities) {
-                            if (feedbackEntity.getIsDelete() == false) {
-                                   return false;
+                            for (TicketEntity ticketEntity : ticketEntities) {
+                                   if (ticketEntity.getIsDelete() == false) {
+                                          return true;
+                                   }
                             }
                      }
+                     if (feedbackEntities.isEmpty() == false) {
 
-                     for (TicketEntity ticketEntity : ticketEntities) {
-                            if (ticketEntity.getIsDelete() == false) {
-                                   return false;
+                            for (FeedbackEntity feedbackEntity : feedbackEntities) {
+                                   if (feedbackEntity.getIsDelete() == false) {
+                                          return true;
+                                   }
                             }
                      }
-                     return true;
+                     return false;
               }
-              return true;
+              return false;
+
        }
 
        @Transactional
@@ -298,12 +311,31 @@ public class AccountService implements SimpleServiceInf<AccountEntity, AccountDT
        }
 
        @Transactional(propagation = Propagation.REQUIRED, readOnly = true, isolation = Isolation.READ_COMMITTED)
+       public Boolean isPassWordUpdate(AccountEntity accountEntity) {
+
+              String pass = accountEntity.getPassWord();
+
+              // lay data doi tuong cu
+              AccountEntity accountEntityOld = this.repo.findByUserName(accountEntity.getUserName()).orElse(null);
+
+              // encode
+              String passEncocdeNew = bCryptPasswordEncoder.encode(pass);
+              String passEncodeOld = accountEntityOld.getPassWord();
+
+              if (passEncocdeNew.equals(passEncodeOld) == true) {
+                     return false;
+              }
+              return true;
+
+       }
+
+       @Transactional(propagation = Propagation.REQUIRED, readOnly = true, isolation = Isolation.READ_COMMITTED)
        public AccountDTO geAccountDTOHasLogin() {
-              
+
               Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
               if (authentication != null && authentication.isAuthenticated()) {
-                     
+
                      // Lấy ra UserDetails
                      Object principal = authentication.getPrincipal();
 
@@ -315,22 +347,21 @@ public class AccountService implements SimpleServiceInf<AccountEntity, AccountDT
 
                             // lay doi tuong duoc xac thuc trong csdl
                             AccountEntity acc = this.repo.findById(username).orElse(null);
-                            
 
                             return this.accountMapping.toDTO(acc);
                      }
-                     return null; 
+                     return null;
               }
               return null;
        }
 
        @Transactional(propagation = Propagation.REQUIRED, readOnly = true, isolation = Isolation.READ_COMMITTED)
        public String getTokenJwt() {
-              
+
               Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
               if (authentication != null && authentication.isAuthenticated()) {
-                     
+
                      // Lấy ra UserDetails
                      Object principal = authentication.getPrincipal();
 
@@ -342,16 +373,127 @@ public class AccountService implements SimpleServiceInf<AccountEntity, AccountDT
 
                             // lay doi tuong duoc xac thuc trong csdl
                             AccountEntity acc = this.repo.findById(username).orElse(null);
-                            
 
                             return jwtService.token(acc);
                      }
-                     return null; 
+                     return null;
               }
               return null;
        }
 
+       // Register user 
+       @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
+       public ResponseObject registerAccountUser(String username, String pass, String email, String fullName,
+                     String phoneNumber) {
 
+              ResponseObject responseObject = new ResponseObject();
 
+              String role = "ROLE_USER";
+              Boolean isDelete = false;
+              Boolean isBlock = false;
+              List<Long> listFeedbackEntities_Id = new ArrayList<>();
+              List<Long> listTicketEntities_Id = new ArrayList<>();
+
+              AccountDTO accountDTO = new AccountDTO(username, pass, email, fullName, phoneNumber, role, isBlock,
+                            isDelete, listFeedbackEntities_Id, listTicketEntities_Id);
+
+              if (save_toDTO(accountDTO).getValueBool()) {
+                     responseObject.setStatus("success");
+                     responseObject.addMessage("mess", "Register success. Now you can login");
+                     responseObject.setData(accountDTO);
+
+                     return responseObject;
+              }
+
+              responseObject.setStatus("failure");
+              responseObject.addMessage("mess", "Register not success.");
+              responseObject.setData(accountDTO);
+
+              return responseObject;
+
+       }
+
+       // Register user 
+       @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
+       public ResponseObject updateAccountForUser(String username, String pass, String email, String fullName,
+                     String phoneNumber) {
+
+              ResponseObject responseObject = new ResponseObject();
+
+              String role = "ROLE_USER";
+              Boolean isDelete = false;
+              Boolean isBlock = false;
+              List<Long> listFeedbackEntities_Id = new ArrayList<>();
+              List<Long> listTicketEntities_Id = new ArrayList<>();
+
+              AccountDTO accountDTO = new AccountDTO(username, pass, email, fullName, phoneNumber, role, isBlock,
+                            isDelete, listFeedbackEntities_Id, listTicketEntities_Id);
+
+              if (update_toDTO(accountDTO).getValueBool()) {
+                     responseObject.setStatus("success");
+                     responseObject.addMessage("mess", "Update success.");
+                     responseObject.setData(accountDTO);
+
+                     return responseObject;
+              }
+
+              responseObject.setStatus("failure");
+              responseObject.addMessage("mess", "Register not success.");
+              responseObject.setData(accountDTO);
+
+              return responseObject;
+
+       }
+
+       public AccountRepo getRepo() {
+              return repo;
+       }
+
+       public void setRepo(AccountRepo repo) {
+              this.repo = repo;
+       }
+
+       public FeedbackRepo getFeedbackRepo() {
+              return feedbackRepo;
+       }
+
+       public void setFeedbackRepo(FeedbackRepo feedbackRepo) {
+              this.feedbackRepo = feedbackRepo;
+       }
+
+       public TicketRepo getTicketRepo() {
+              return ticketRepo;
+       }
+
+       public void setTicketRepo(TicketRepo ticketRepo) {
+              this.ticketRepo = ticketRepo;
+       }
+
+       public AccountMapping getAccountMapping() {
+              return accountMapping;
+       }
+
+       public void setAccountMapping(AccountMapping accountMapping) {
+              this.accountMapping = accountMapping;
+       }
+
+       public JwtService getJwtService() {
+              return jwtService;
+       }
+
+       public void setJwtService(JwtService jwtService) {
+              this.jwtService = jwtService;
+       }
+
+       public BCryptPasswordEncoder getbCryptPasswordEncoder() {
+              return bCryptPasswordEncoder;
+       }
+
+       // @Transactional
+       // @Override
+       // public Boolean isHasForeignKeyEntity(AccountDTO dtoObj) {
+       // // Account không có thuộc tinhgs khóa ngoại
+       // return true;
+       // }
 
 }

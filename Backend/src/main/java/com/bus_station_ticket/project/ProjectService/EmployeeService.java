@@ -1,7 +1,9 @@
 package com.bus_station_ticket.project.ProjectService;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.bus_station_ticket.project.ProjectConfig.ResponseBoolAndMess;
+import com.bus_station_ticket.project.ProjectConfig.ResponseObject;
 import com.bus_station_ticket.project.ProjectDTO.EmployeeDTO;
 import com.bus_station_ticket.project.ProjectEntity.BusEntity;
 import com.bus_station_ticket.project.ProjectEntity.EmployeeEntity;
@@ -65,7 +68,7 @@ public class EmployeeService implements SimpleServiceInf<EmployeeEntity, Employe
        @Override
        public List<EmployeeEntity> getAll() {
               return this.repo.findAll();
-              
+
        }
 
        // Mapping đối tượng List<EmployeeEntity> --> List<EmployeeDTO>
@@ -80,9 +83,9 @@ public class EmployeeService implements SimpleServiceInf<EmployeeEntity, Employe
                      for (EmployeeEntity e : listEmployeeEntities) {
                             listEmployeeDTOs.add(this.employeeMapping.toDTO(e));
                      }
-                     return  listEmployeeDTOs;
+                     return listEmployeeDTOs;
               }
-              return  listEmployeeDTOs;
+              return listEmployeeDTOs;
        }
 
        @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
@@ -94,7 +97,7 @@ public class EmployeeService implements SimpleServiceInf<EmployeeEntity, Employe
               if (optional.isPresent()) {
                      Boolean check = foreignKeyViolationIfDelete(optional.get());
 
-                     if (check) {
+                     if (check == false) {
                             this.repo.delete(optional.get());
                             return new ResponseBoolAndMess(true, MESS_DELETE_SUCCESS);
                      }
@@ -107,9 +110,11 @@ public class EmployeeService implements SimpleServiceInf<EmployeeEntity, Employe
        @Override
        public ResponseBoolAndMess save(EmployeeEntity entityObj) {
 
-              Optional<EmployeeEntity> optional = this.repo.findByDriverId(entityObj.getDriverId());
+              // Optional<EmployeeEntity> optional =
+              // this.repo.findByDriverId(entityObj.getDriverId());
 
-              if (optional.isPresent() == false && isForeignKeyEmpty(entityObj) == false) {
+              if (isForeignKeyEmpty(entityObj) == false) {
+                     entityObj.setDriverId(null);
                      this.repo.save(entityObj);
                      return new ResponseBoolAndMess(true, MESS_SAVE_SUCCESS);
               }
@@ -130,11 +135,14 @@ public class EmployeeService implements SimpleServiceInf<EmployeeEntity, Employe
        public ResponseBoolAndMess update(EmployeeEntity entityObj) {
               Optional<EmployeeEntity> optional = this.repo.findByDriverId(entityObj.getDriverId());
 
-              if (optional.isPresent() && isForeignKeyEmpty(entityObj) == false) {
+              if (optional.isPresent() && isForeignKeyEmpty(entityObj) == false
+                            && foreignKeyViolationIfHidden(entityObj) == false) {
+                     // entityObj.setDriverId(null);
                      this.repo.save(entityObj);
                      return new ResponseBoolAndMess(true, MESS_UPDATE_SUCCESS);
               }
-              return new ResponseBoolAndMess(false, MESS_UPDATE_FAILURE + "," + MESS_OBJECT_NOT_EXIST + " or " + MESS_FOREIGN_KEY_VIOLATION);
+              return new ResponseBoolAndMess(false,
+                            MESS_UPDATE_FAILURE + "," + MESS_OBJECT_NOT_EXIST + " or " + MESS_FOREIGN_KEY_VIOLATION);
        }
 
        @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.REPEATABLE_READ, rollbackFor = Exception.class)
@@ -154,7 +162,7 @@ public class EmployeeService implements SimpleServiceInf<EmployeeEntity, Employe
               if (optional.isPresent()) {
                      Boolean check = foreignKeyViolationIfHidden(optional.get());
 
-                     if (check) {
+                     if (check == false) {
                             EmployeeEntity employeeEntity = optional.get();
                             employeeEntity.setIsDelete(check);
                             this.repo.save(employeeEntity);
@@ -176,7 +184,7 @@ public class EmployeeService implements SimpleServiceInf<EmployeeEntity, Employe
               List<PenaltyTicketEntity> penaltyTicketEntities = this.penaltyTicketRepo
                             .findByEmployeeEntity_Id(entityObj.getDriverId());
 
-              if (busEntities.isEmpty() == false && penaltyTicketEntities.isEmpty() == false) {
+              if (busEntities.isEmpty() == true && penaltyTicketEntities.isEmpty() == true) {
                      return false;
               }
 
@@ -186,29 +194,34 @@ public class EmployeeService implements SimpleServiceInf<EmployeeEntity, Employe
        @Transactional
        @Override
        public Boolean foreignKeyViolationIfHidden(EmployeeEntity entityObj) {
-              // Employee foreign key bus, penalty_ticket
-              List<BusEntity> busEntities = this.busRepo.findByEmployeeEntity_Id(entityObj.getDriverId());
 
-              List<PenaltyTicketEntity> penaltyTicketEntities = this.penaltyTicketRepo
-                            .findByEmployeeEntity_Id(entityObj.getDriverId());
+              if (entityObj.getIsDelete()) {
+                     // Employee foreign key bus, penalty_ticket
+                     List<BusEntity> busEntities = this.busRepo.findByEmployeeEntity_Id(entityObj.getDriverId());
 
-              if (busEntities.isEmpty() == false && penaltyTicketEntities.isEmpty() == false) {
+                     List<PenaltyTicketEntity> penaltyTicketEntities = this.penaltyTicketRepo
+                                   .findByEmployeeEntity_Id(entityObj.getDriverId());
 
-                     for (BusEntity e : busEntities) {
-                            if (e.getIsDelete() == false) {
-                                   return false;
+                     if (busEntities.isEmpty() == false) {
+
+                            for (BusEntity e : busEntities) {
+                                   if (e.getIsDelete() == false) {
+                                          return true;
+                                   }
+                            }
+                     }
+                     if (penaltyTicketEntities.isEmpty() == false) {
+                            for (PenaltyTicketEntity e : penaltyTicketEntities) {
+                                   if (e.getIsDelete() == false) {
+                                          return true;
+                                   }
                             }
                      }
 
-                     for (PenaltyTicketEntity e : penaltyTicketEntities) {
-                            if (e.getIsDelete() == false) {
-                                   return false;
-                            }
-                     }
-                     return true;
+                     return false;
               }
+              return false;
 
-              return true;
        }
 
        @Transactional
@@ -217,6 +230,73 @@ public class EmployeeService implements SimpleServiceInf<EmployeeEntity, Employe
               // Employee khong co thuoc tinh khoa ngoai
               return false;
        }
-       
 
+       // @Override
+       // public Boolean isHasForeignKeyEntity(EmployeeDTO dtoObj) {
+       // // Employee khong co thuoc tinh khoa ngoai
+       // return true;
+       // }
+
+       // Phan nhan vien lai xe
+       @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
+       public ResponseBoolAndMess addEmployeeDriverBus(Long driverId, Long busId) {
+
+              EmployeeEntity employeeEntity = this.repo.findByDriverId(driverId).orElse(null);
+              BusEntity busEntity = this.busRepo.findByBusId(busId).orElse(null);
+
+              if (employeeEntity != null && busEntity != null) {
+
+                     // kiem tra xem co duoc phan tu truoc khonng
+                     if (busEntity.getListEmployeeEntities().contains(employeeEntity) == false) {
+                            int value = this.repo.insertBusAndEmplyee(busId, driverId);
+                            if (value > 0) {
+                                   return new ResponseBoolAndMess(true,
+                                                 "Assign bus driver with " + busId + " code successfully");
+                            }
+                            return new ResponseBoolAndMess(false,
+                                          "Assign bus driver with " + busId + " code no successfully");
+                     }
+                     return new ResponseBoolAndMess(false,
+                                   "Assign bus driver with " + busId
+                                                 + " code no successfully because it had already been assigned before");
+              }
+              return new ResponseBoolAndMess(false, "Assign bus driver with " + busId + " code no successfully");
+
+       }
+
+       @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
+       public ResponseBoolAndMess deleteEmployeeDriverBus(Long driverId, Long busId) {
+
+              int value = this.repo.deleteBusAndEmplyee(busId, driverId);
+
+              if (value > 0) {
+                     return new ResponseBoolAndMess(true,
+                                   "Deletion of bus driver assignment with " + busId + " code successfully");
+              }
+              return new ResponseBoolAndMess(false,
+                            "Deletion of bus driver assignment with " + busId + " code no successfully");
+       }
+
+       // trả dữ liệu mã nhân viên và mã xe
+       public ResponseObject getAllDriverIdAndBusId() {
+
+              Map<Long, Long> busId_driverId = new HashMap<>();
+
+              ResponseObject responseObject = new ResponseObject();
+
+              List<EmployeeEntity> employeeEntities = this.repo.findAll();
+
+              for (EmployeeEntity e : employeeEntities) {
+                     List<BusEntity> busEntities = e.getListBusEntity();
+                     for (BusEntity b : busEntities) {
+                            busId_driverId.put(b.getBusId(), e.getDriverId());;
+                     }
+              }
+
+              responseObject.setStatus("success");
+              responseObject.addMessage("mess", "All data BusEmployee Table. <busId : driverId>");
+              responseObject.setData(busId_driverId);
+
+              return responseObject;
+       }
 }

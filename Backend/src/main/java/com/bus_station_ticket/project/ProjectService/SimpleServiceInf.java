@@ -25,6 +25,7 @@ public interface SimpleServiceInf<ENTITY,DTO,ID> {
        
        
        public final String MESS_FOREIGN_KEY_VIOLATION = "Foreign key violation error";
+       public final String MESS_FOREIGN_KEY_EMPTY = "Foreign key empty error";
        
        // Entity
        public ENTITY getById(ID id);
@@ -39,11 +40,13 @@ public interface SimpleServiceInf<ENTITY,DTO,ID> {
        public List<DTO> getAll_toDTO();
        public ResponseBoolAndMess save_toDTO (DTO dtoObj);
        public ResponseBoolAndMess update_toDTO (DTO dtoObj);
+       // public Boolean isHasForeignKeyEntity(DTO dtoObj);
 
        //
        public Boolean foreignKeyViolationIfDelete(ENTITY entityObj);
        public Boolean foreignKeyViolationIfHidden(ENTITY entityObj);
        public Boolean isForeignKeyEmpty(ENTITY entityObj);
+       
 
        default <T> Boolean compareId (T id1, T id2){
               

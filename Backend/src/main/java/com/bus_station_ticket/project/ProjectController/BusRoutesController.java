@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bus_station_ticket.project.ProjectConfig.LoggerConfig;
 import com.bus_station_ticket.project.ProjectConfig.ResponseBoolAndMess;
 import com.bus_station_ticket.project.ProjectConfig.ResponseObject;
 import com.bus_station_ticket.project.ProjectDTO.BusRoutesDTO;
@@ -49,6 +50,8 @@ public class BusRoutesController implements RestApiSimpleControllerInf<BusRoutes
                      responseObject.addMessage("length", listBusRoutesEntities.size());
                      responseObject.addMessage("info", responseObject.getPathBasicInfor("busroutes", "{routesId}"));
 
+                     LoggerConfig.writeInfoLevel(BusRoutesController.class, "/busroutes", "Successfully retrieved data");
+
                      return ResponseEntity.status(HttpStatus.OK).body(responseObject);
 
               }
@@ -56,6 +59,8 @@ public class BusRoutesController implements RestApiSimpleControllerInf<BusRoutes
               responseObject.setData(listBusRoutesEntities);
               responseObject.addMessage("mess", "There is no data in the database");
               responseObject.addMessage("length", listBusRoutesEntities.size());
+
+              LoggerConfig.writeWarningLevel(BusRoutesController.class, "/busroutes", "There is no data in the database");
 
               return ResponseEntity.status(HttpStatus.OK).body(responseObject);
        }
@@ -78,12 +83,17 @@ public class BusRoutesController implements RestApiSimpleControllerInf<BusRoutes
                      responseObject.addMessage("mess", "Found data with matching bus routes id");
 
                      responseObject.addMessage("info", responseObject.getPathBasicInfor("busroutes", "{routesId}"));
+
+                     LoggerConfig.writeInfoLevel(BusRoutesController.class, "/busroutes/{routesId}", "Found data with matching bus routes id");
+
                      return ResponseEntity.status(HttpStatus.OK).body(responseObject);
               }
 
               responseObject.setStatus(MESS_FAILURE);
               responseObject.setData(busRoutesDTO);
               responseObject.addMessage("mess", "No bus routes entity found with matching routes id");
+
+              LoggerConfig.writeWarningLevel(BusRoutesController.class, "/busroutes/{routesId}", "No bus routes entity found with matching routes id");
 
               return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
        }
@@ -99,6 +109,9 @@ public class BusRoutesController implements RestApiSimpleControllerInf<BusRoutes
                      responseObject.setStatus(MESS_FAILURE);
                      responseObject.addMessage("mess", "Missing path variable value or incorrect path variable value");     
                      responseObject.setData(id);
+
+                     LoggerConfig.writeErrorLevel(BusRoutesController.class, "/busroutes/delete/{routesId}", "Missing path variable value or incorrect path variable value");
+
                      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
               }
 
@@ -115,12 +128,17 @@ public class BusRoutesController implements RestApiSimpleControllerInf<BusRoutes
                      responseObject.addMessage("mess", responseBoolAndMess.getValueMess());
 
                      responseObject.addMessage("info", responseObject.getPathBasicInfor("busroutes", "{routesId}"));
+
+                     LoggerConfig.writeInfoLevel(BusRoutesController.class, "/busroutes/delete/{routesId}", responseBoolAndMess.getValueMess());
+
                      return ResponseEntity.status(HttpStatus.OK).body(responseObject);
               }
 
               responseObject.setStatus(MESS_FAILURE);
               responseObject.setData(busRoutesDTO);
               responseObject.addMessage("mess", responseBoolAndMess.getValueMess());
+
+              LoggerConfig.writeWarningLevel(BusRoutesController.class, "/busroutes/delete/{routesId}", responseBoolAndMess.getValueMess());
 
               return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
        }
@@ -136,6 +154,9 @@ public class BusRoutesController implements RestApiSimpleControllerInf<BusRoutes
                      responseObject.setStatus(MESS_FAILURE);
                      responseObject.addMessage("mess", "Missing path variable value or incorrect path variable value");     
                      responseObject.setData(id);
+
+                     LoggerConfig.writeErrorLevel(BusRoutesController.class, "/busroutes/hidden/{routesId}","Missing path variable value or incorrect path variable value");
+
                      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
               }
 
@@ -152,12 +173,17 @@ public class BusRoutesController implements RestApiSimpleControllerInf<BusRoutes
                      responseObject.addMessage("mess", responseBoolAndMess.getValueMess());
 
                      responseObject.addMessage("info", responseObject.getPathBasicInfor("busroutes", "{routesId}"));
+
+                     LoggerConfig.writeInfoLevel(BusRoutesController.class, "/busroutes/hidden/{routesId}",responseBoolAndMess.getValueMess());
+
                      return ResponseEntity.status(HttpStatus.OK).body(responseObject);
               }
 
               responseObject.setStatus(MESS_FAILURE);
               responseObject.setData(busRoutesDTO);
               responseObject.addMessage("mess", responseBoolAndMess.getValueMess());
+
+              LoggerConfig.writeWarningLevel(BusRoutesController.class, "/busroutes/hidden/{routesId}",responseBoolAndMess.getValueMess());
 
               return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
        }
@@ -176,6 +202,8 @@ public class BusRoutesController implements RestApiSimpleControllerInf<BusRoutes
                      
                      responseObject.addMessage("info", responseObject.getPathBasicInfor("busroutes", "{routesId}"));
 
+                     LoggerConfig.writeInfoLevel(BusRoutesController.class, "/busroutes/insert",responseBoolAndMess.getValueMess());
+
                      return ResponseEntity.status(HttpStatus.OK).body(responseObject);
               }
 
@@ -183,6 +211,7 @@ public class BusRoutesController implements RestApiSimpleControllerInf<BusRoutes
               responseObject.setData(obj);
               responseObject.addMessage("mess", responseBoolAndMess.getValueMess());
 
+              LoggerConfig.writeWarningLevel(BusRoutesController.class, "/busroutes/insert",responseBoolAndMess.getValueMess());
 
               return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
        }
@@ -201,6 +230,8 @@ public class BusRoutesController implements RestApiSimpleControllerInf<BusRoutes
                      
                      responseObject.addMessage("info", responseObject.getPathBasicInfor("busroutes", "{routesId}"));
 
+                     LoggerConfig.writeInfoLevel(BusRoutesController.class, "/busroutes/update",responseBoolAndMess.getValueMess());
+
                      return ResponseEntity.status(HttpStatus.OK).body(responseObject);
               }
 
@@ -208,6 +239,7 @@ public class BusRoutesController implements RestApiSimpleControllerInf<BusRoutes
               responseObject.setData(obj);
               responseObject.addMessage("mess", responseBoolAndMess.getValueMess());
 
+              LoggerConfig.writeWarningLevel(BusRoutesController.class, "/busroutes/update",responseBoolAndMess.getValueMess());
 
               return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
        }

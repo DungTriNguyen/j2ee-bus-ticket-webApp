@@ -87,7 +87,7 @@ public class FeedbackService implements SimpleServiceInf<FeedbackEntity, Feedbac
               if (optional.isPresent()) {
                      Boolean check = foreignKeyViolationIfDelete(optional.get());
 
-                     if (check) {
+                     if (check == false) {
                             this.repo.delete(optional.get());
                             return new ResponseBoolAndMess(true, MESS_DELETE_SUCCESS);
                      }
@@ -101,9 +101,11 @@ public class FeedbackService implements SimpleServiceInf<FeedbackEntity, Feedbac
        @Override
        public ResponseBoolAndMess save(FeedbackEntity entityObj) {
 
-              Optional<FeedbackEntity> optional = this.repo.findByFeedbackId(entityObj.getFeedbackId());
+              // Optional<FeedbackEntity> optional =
+              // this.repo.findByFeedbackId(entityObj.getFeedbackId());
 
-              if (optional.isPresent() == false && isForeignKeyEmpty(entityObj) == false) {
+              if (isForeignKeyEmpty(entityObj) == false) {
+                     entityObj.setFeedbackId(null);
                      this.repo.save(entityObj);
                      return new ResponseBoolAndMess(true, MESS_SAVE_SUCCESS);
               }
@@ -113,9 +115,13 @@ public class FeedbackService implements SimpleServiceInf<FeedbackEntity, Feedbac
        @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
        @Override
        public ResponseBoolAndMess save_toDTO(FeedbackDTO dtoObj) {
+
+              /// kiem tra gia tri thuoc tinh khoa ngoai
+
               FeedbackEntity feedbackEntity = this.feedbackMapping.toEntity(dtoObj);
 
               return save(feedbackEntity);
+
        }
 
        @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.REPEATABLE_READ, rollbackFor = Exception.class)
@@ -123,21 +129,26 @@ public class FeedbackService implements SimpleServiceInf<FeedbackEntity, Feedbac
        public ResponseBoolAndMess update(FeedbackEntity entityObj) {
               Optional<FeedbackEntity> optional = this.repo.findByFeedbackId(entityObj.getFeedbackId());
 
-              if (optional.isPresent() && isForeignKeyEmpty(entityObj) == false) {
+              if (optional.isPresent() && isForeignKeyEmpty(entityObj) == false && foreignKeyViolationIfHidden(entityObj) == false) {
+                     
                      this.repo.save(entityObj);
                      return new ResponseBoolAndMess(true, MESS_UPDATE_SUCCESS);
               }
 
-              return new ResponseBoolAndMess(false, MESS_UPDATE_FAILURE + "," + MESS_OBJECT_NOT_EXIST + " or " + MESS_FOREIGN_KEY_VIOLATION);
+              return new ResponseBoolAndMess(false,
+                            MESS_UPDATE_FAILURE + "," + MESS_OBJECT_NOT_EXIST + " or " + MESS_FOREIGN_KEY_VIOLATION);
        }
 
        @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.REPEATABLE_READ, rollbackFor = Exception.class)
        @Override
        public ResponseBoolAndMess update_toDTO(FeedbackDTO dtoObj) {
 
+              /// kiem tra gia tri thuoc tinh khoa ngoai
+
               FeedbackEntity feedbackEntity = this.feedbackMapping.toEntity(dtoObj);
 
               return update(feedbackEntity);
+
        }
 
        @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
@@ -149,7 +160,7 @@ public class FeedbackService implements SimpleServiceInf<FeedbackEntity, Feedbac
               if (optional.isPresent()) {
                      Boolean check = foreignKeyViolationIfHidden(optional.get());
 
-                     if (check) {
+                     if (check == false) {
                             FeedbackEntity feedbackEntity = optional.get();
 
                             feedbackEntity.setIsDelete(true);
@@ -167,13 +178,13 @@ public class FeedbackService implements SimpleServiceInf<FeedbackEntity, Feedbac
        public Boolean foreignKeyViolationIfDelete(FeedbackEntity entityObj) {
 
               // Feedback khong co tham chiu khoa ngoai
-              return true;
+              return false;
        }
 
        @Transactional
        @Override
        public Boolean foreignKeyViolationIfHidden(FeedbackEntity entityObj) {
-              return true;
+              return false;
        }
 
        @Transactional
@@ -190,5 +201,24 @@ public class FeedbackService implements SimpleServiceInf<FeedbackEntity, Feedbac
 
               return true;
        }
+
+       // @Transactional(propagation = Propagation.REQUIRED, readOnly = true, isolation
+       // = Isolation.READ_COMMITTED)
+       // @Override
+       // public Boolean isHasForeignKeyEntity(FeedbackDTO dtoObj) {
+       // // Feedback co thuoc tinh khoa ngoai la username va ticketId
+       // // kiem tra
+
+       // AccountEntity accountEntity =
+       // this.accountRepo.findByUserName(dtoObj.getAccountEnity_userName())
+       // .orElse(null);
+       // TicketEntity ticketEntity =
+       // this.ticketRepo.findByTicketId(dtoObj.getTicketEntity_Id()).orElse(null);
+
+       // if (accountEntity != null && ticketEntity != null) {
+       // return true;
+       // }
+       // return false;
+       // }
 
 }

@@ -11,7 +11,7 @@ export const getPayments = async (): Promise<Payment[]> => {
   });
 };
 
-export const getPaymentById = async (paymentId: string): Promise<Payment> => {
+export const getPaymentById = async (paymentId: number): Promise<Payment> => {
   return apiRequest(async () => {
     const response = await apiClient.get<ApiResponse<Payment>>(`/payments/${paymentId}`);
     return response.data.data!;
@@ -32,14 +32,14 @@ export const updatePayment = async (payment: Partial<Payment>): Promise<Payment>
   });
 };
 
-export const deletePayment = async (paymentId: string): Promise<Payment> => {
+export const deletePayment = async (paymentId: number): Promise<Payment> => {
   return apiRequest(async () => {
-    const response = await apiClient.delete<ApiResponse<Payment>>(`/payments/${paymentId}`);
+    const response = await apiClient.delete<ApiResponse<Payment>>(`/payments/delete/${paymentId}`);
     return response.data.data!;
   });
 };
 
-export const hidePayment = async (paymentId: string): Promise<Payment> => {
+export const hidePayment = async (paymentId: number): Promise<Payment> => {
   return apiRequest(async () => {
     const response = await apiClient.delete<ApiResponse<Payment>>(`/payments/hidden/${paymentId}`);
     return response.data.data!;

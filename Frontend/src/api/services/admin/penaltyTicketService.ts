@@ -11,7 +11,7 @@ export const getPenaltyTickets = async (): Promise<PenaltyTicket[]> => {
   });
 };
 
-export const getPenaltyTicketById = async (penaltyTicketId: string): Promise<PenaltyTicket> => {
+export const getPenaltyTicketById = async (penaltyTicketId: number): Promise<PenaltyTicket> => {
   return apiRequest(async () => {
     const response = await apiClient.get<ApiResponse<PenaltyTicket>>(`/penaltytickets/${penaltyTicketId}`);
     return response.data.data!;
@@ -32,14 +32,14 @@ export const updatePenaltyTicket = async (penaltyTicket: Partial<PenaltyTicket>)
   });
 };
 
-export const deletePenaltyTicket = async (penaltyTicketId: string): Promise<PenaltyTicket> => {
+export const deletePenaltyTicket = async (penaltyTicketId: number): Promise<PenaltyTicket> => {
   return apiRequest(async () => {
-    const response = await apiClient.delete<ApiResponse<PenaltyTicket>>(`/penaltytickets/${penaltyTicketId}`);
+    const response = await apiClient.delete<ApiResponse<PenaltyTicket>>(`/penaltytickets/delete/${penaltyTicketId}`);
     return response.data.data!;
   });
 };
 
-export const hidePenaltyTicket = async (penaltyTicketId: string): Promise<PenaltyTicket> => {
+export const hidePenaltyTicket = async (penaltyTicketId: number): Promise<PenaltyTicket> => {
   return apiRequest(async () => {
     const response = await apiClient.delete<ApiResponse<PenaltyTicket>>(`/penaltytickets/hidden/${penaltyTicketId}`);
     return response.data.data!;

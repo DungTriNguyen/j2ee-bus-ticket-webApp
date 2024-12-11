@@ -1,31 +1,33 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import DataTable from 'react-data-table-component';
-import PropTypes from 'prop-types';
 import { Dropdown, TextInput } from 'flowbite-react';
 
-Table.propTypes = {
-  columns: PropTypes.arrayOf(
-    PropTypes.shape({
-      name: PropTypes.string.isRequired,
-      selector: PropTypes.func,
-      sortable: PropTypes.bool,
-    })
-  ).isRequired,
-  rows: PropTypes.arrayOf(PropTypes.object).isRequired,
-  searchableFields: PropTypes.arrayOf(PropTypes.string),
-  onEdit: PropTypes.func,
-  onDelete: PropTypes.func,
-};
+interface TableProps {
+  columns: Array<{
+    name: string;
+    selector?: (row: any) => any;
+    sortable?: boolean;
+  }>;
+  rows: Array<Record<string, any>>;
+  searchableFields?: string[];
+  onEdit?: (row: any) => void;
+  onDelete?: (row: any) => void;
+}
 
-export default function Table({ columns, rows, searchableFields = [], onEdit, onDelete }) {
+export default function Table({
+  columns,
+  rows,
+  searchableFields = [],
+  onEdit,
+  onDelete,
+}: TableProps) {
   const [data, setData] = useState(rows);
   const [search, setSearch] = useState('');
 
-  const handleSearch = (e) => {
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.toLowerCase();
     setSearch(value);
 
-    // Ensure rows are defined and not empty before filtering
     if (!rows || rows.length === 0) return;
 
     const fieldsToSearch =
@@ -41,15 +43,19 @@ export default function Table({ columns, rows, searchableFields = [], onEdit, on
     setData(filteredData);
   };
 
+  useEffect(() => {
+    setData(rows);
+  }, [rows]);
+
   const actionColumn = {
     name: 'Actions',
-    cell: (row) => (
+    cell: (row: any) => (
       <Dropdown size='sm' inline label='Chỉnh sửa' dismissOnClick={false}>
-        <Dropdown.Item onClick={() => onEdit(row)}>Cập nhật</Dropdown.Item>
-        <Dropdown.Item onClick={() => console.log('Delete item:', row)}>Xóa</Dropdown.Item>
+        <Dropdown.Item onClick={() => onEdit && onEdit(row)}>Cập nhật</Dropdown.Item>
+        <Dropdown.Item onClick={() => onDelete && onDelete(row)}>Xóa</Dropdown.Item>
       </Dropdown>
     ),
-    ignoreRowClick: true,
+    ignorerowclick: true,
     allowoverflow: true,
   };
 
@@ -68,7 +74,6 @@ export default function Table({ columns, rows, searchableFields = [], onEdit, on
         <DataTable
           columns={[...columns, actionColumn]}
           data={data}
-          searchableFields={['name', 'email']}
           fixedHeader
           pagination
           striped

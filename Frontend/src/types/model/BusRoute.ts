@@ -3,9 +3,9 @@ export interface BusRoute {
   departureLocation: string;
   destinationLocation: string;
   distanceKilometer: number;
-  departureTime: string;
-  arivalTime: string;
+  tripTime: string;
+  // arivalTime: string;
   price: number;
   isDelete: boolean;
-  listTicketEntities_Id: any[];
+  listBusRouteSchedules_Id: number[];
 }

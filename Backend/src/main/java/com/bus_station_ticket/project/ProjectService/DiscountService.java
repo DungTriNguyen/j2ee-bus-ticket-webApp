@@ -90,7 +90,7 @@ public class DiscountService implements SimpleServiceInf<DiscountEntity, Discoun
                      // Kiem tra khoa ngoai
                      Boolean check = foreignKeyViolationIfDelete(optional.get());
 
-                     if (check) {
+                     if (check == false) {
                             this.repo.delete(optional.get());
                             return new ResponseBoolAndMess(true, MESS_DELETE_SUCCESS);
                      }
@@ -102,9 +102,11 @@ public class DiscountService implements SimpleServiceInf<DiscountEntity, Discoun
        @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
        @Override
        public ResponseBoolAndMess save(DiscountEntity entityObj) {
-              Optional<DiscountEntity> optional = this.repo.findByDiscountId(entityObj.getDiscountId());
+              // Optional<DiscountEntity> optional =
+              // this.repo.findByDiscountId(entityObj.getDiscountId());
 
-              if (optional.isPresent() == false && isForeignKeyEmpty(entityObj) == false) {
+              if (isForeignKeyEmpty(entityObj) == false) {
+                     entityObj.setDiscountId(null);
                      this.repo.save(entityObj);
                      return new ResponseBoolAndMess(true, MESS_SAVE_SUCCESS);
               }
@@ -125,12 +127,15 @@ public class DiscountService implements SimpleServiceInf<DiscountEntity, Discoun
 
               Optional<DiscountEntity> optional = this.repo.findByDiscountId(entityObj.getDiscountId());
 
-              if (optional.isPresent() && isForeignKeyEmpty(entityObj) == false) {
+              if (optional.isPresent() && isForeignKeyEmpty(entityObj) == false
+                            && foreignKeyViolationIfHidden(entityObj) == false) {
+
                      this.repo.save(entityObj);
                      return new ResponseBoolAndMess(true, MESS_UPDATE_SUCCESS);
               }
 
-              return new ResponseBoolAndMess(false, MESS_UPDATE_FAILURE + "," + MESS_OBJECT_NOT_EXIST + " or " + MESS_FOREIGN_KEY_VIOLATION);
+              return new ResponseBoolAndMess(false,
+                            MESS_UPDATE_FAILURE + "," + MESS_OBJECT_NOT_EXIST + " or " + MESS_FOREIGN_KEY_VIOLATION);
        }
 
        @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.REPEATABLE_READ, rollbackFor = Exception.class)
@@ -152,7 +157,7 @@ public class DiscountService implements SimpleServiceInf<DiscountEntity, Discoun
                      // kierm tra
                      Boolean check = foreignKeyViolationIfHidden(optional.get());
 
-                     if (check) {
+                     if (check == false) {
                             DiscountEntity discountEntity = optional.get();
                             discountEntity.setIsDelete(true);
                             this.repo.save(discountEntity);
@@ -172,26 +177,32 @@ public class DiscountService implements SimpleServiceInf<DiscountEntity, Discoun
               List<TicketEntity> ticketEntities = this.ticketRepo.findByDiscountEntity_Id(entityObj.getDiscountId());
 
               if (ticketEntities.isEmpty() == false) {
-                     return false;
+                     return true;
               }
-              return true;
+              return false;
        }
 
        @Transactional
        @Override
        public Boolean foreignKeyViolationIfHidden(DiscountEntity entityObj) {
-              // Discount foreign key ticket
-              List<TicketEntity> ticketEntities = this.ticketRepo.findByDiscountEntity_Id(entityObj.getDiscountId());
 
-              if (ticketEntities.isEmpty() == false) {
-                     for (TicketEntity e : ticketEntities) {
-                            if (e.getIsDelete() == false) {
-                                   return false;
+              if (entityObj.getIsDelete()) {
+                     // Discount foreign key ticket
+                     List<TicketEntity> ticketEntities = this.ticketRepo
+                                   .findByDiscountEntity_Id(entityObj.getDiscountId());
+
+                     if (ticketEntities.isEmpty() == false) {
+                            for (TicketEntity e : ticketEntities) {
+                                   if (e.getIsDelete() == false) {
+                                          return true;
+                                   }
                             }
+                            return false;
                      }
-                     return true;
+                     return false;
               }
-              return true;
+              return false;
+
        }
 
        @Transactional
@@ -201,6 +212,10 @@ public class DiscountService implements SimpleServiceInf<DiscountEntity, Discoun
               return false;
        }
 
-       
+       // @Override
+       // public Boolean isHasForeignKeyEntity(DiscountDTO dtoObj) {
+       // // Discount khong co thuoc tinh khoa ngoai
+       // return true;
+       // }
 
 }

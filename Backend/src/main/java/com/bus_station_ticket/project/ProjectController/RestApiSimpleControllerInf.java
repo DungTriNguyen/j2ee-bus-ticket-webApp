@@ -23,6 +23,8 @@ public interface RestApiSimpleControllerInf<T,ID> {
        public final String MESS_SUCCESS = "success";
        public final String MESS_FAILURE = "failure";
 
+       
+
 
        public ResponseEntity<ResponseObject> getAll();
        
@@ -57,5 +59,6 @@ public interface RestApiSimpleControllerInf<T,ID> {
               }
               return false;
        }
+
 
 }

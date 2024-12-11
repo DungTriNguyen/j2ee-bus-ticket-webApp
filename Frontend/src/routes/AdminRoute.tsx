@@ -8,30 +8,33 @@ import AdminSidebar from '../components/admin/AdminSidebar';
 import AdminDashboard from '../pages/admin/AdminDashboard';
 import Trip from '../pages/admin/Trip';
 import TripRoute from '../pages/admin/TripRoute';
+import BusRouteSchedule  from '../pages/admin/BusRouteSchedule';
 import Bus from '../pages/admin/Bus';
 import Driver from '../pages/admin/Driver';
 import Ticket from '../pages/admin/Ticket';
 import Payment from '../pages/admin/Payment';
 import Discount from '../pages/admin/Discount';
 import FeedBack from '../pages/admin/FeedBack';
-import Revenue from '../pages/admin/Revenue';
 import UnAuthorized from '../pages/shared/UnAuthorized';
 import PenaltyTicket from '../pages/admin/PenaltyTicket';
 import Account from '../pages/admin/Account';
+import ProtectedRoute from '../components/ProtectedRoute';
 
 export default function AdminRoute() {
-  const { user } = useSelector((state: RootState) => state.auth);
+  const user = useSelector((state: RootState) => state.user);
 
-  // if (!user) {
-  //   return <Navigate to="/dang-nhap" replace />;
-  // }
+  const userRole = user.currentUser?.role;
 
-  // if(user.role !== 'ADMIN') {
-  //   return <Navigate to="/unauthorized" replace />;
-  // }
+  if(userRole === 'ROLE_USER') {
+    return <Navigate to="/unauthorized" replace />;
+  }
+
+  if (userRole !== 'ROLE_ADMIN' && userRole !== 'ROLE_MANAGER') {
+    return <Navigate to="/unauthorized" replace />;
+  }
 
   return (
-    <>
+    <ProtectedRoute>
       <div className='flex h-screen'>
         <AdminSidebar />
 
@@ -40,7 +43,8 @@ export default function AdminRoute() {
           <Routes>
             <Route path='/' element={<AdminDashboard />} />
             <Route path='/chuyen-di' element={<Trip />} />
-            <Route path='/lich-trinh' element={<TripRoute />} />
+            <Route path='/phan-cong-xe-tuyen' element={<BusRouteSchedule />} />
+            <Route path='/tuyen-xe' element={<TripRoute />} />
             <Route path='/khach-hang' element={<Account />} />
             <Route path='/xe' element={<Bus />} />
             <Route path='/tai-xe' element={<Driver />} />
@@ -49,12 +53,12 @@ export default function AdminRoute() {
             <Route path='/thanh-toan' element={<Payment />} />
             <Route path='/khuyen-mai' element={<Discount />} />
             <Route path='/phan-hoi' element={<FeedBack />} />
-            <Route path='/doanh-thu' element={<Revenue />} />
+            <Route path='/thanh-toan' element={<Payment />} />
 
             <Route path='/unauthorized' element={<UnAuthorized />} />
           </Routes>
         </div>
       </div>
-    </>
+    </ProtectedRoute>
   );
 }

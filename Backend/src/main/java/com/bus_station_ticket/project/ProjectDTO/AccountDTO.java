@@ -14,7 +14,11 @@ public class AccountDTO {
        private String userName;
 
        @NotBlank(message = "Cannot be left blank !")
-       @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*(),.?\":{}|<>])[a-zA-Z0-9!@#$%^&*(),.?\":{}|<>]{5,20}$", message = "Must be 5-20 characters long, containing at least one digit, one uppercase letter, one lowercase letter, and one special character")
+       // @Pattern(regexp =
+       // "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*(),.?\":{}|<>])[a-zA-Z0-9!@#$%^&*(),.?\":{}|<>]{5,}$",
+       // message = "Must be 5 characters long more, containing at least one digit, one
+       // uppercase letter, one lowercase letter, and one special character")
+       @Size(min = 5, message = "Must be 5 characters long more")
        private String passWord;
 
        @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@(gmail|outlook)\\.com$", message = "You need to enter your gmail or outlook address")
@@ -26,7 +30,7 @@ public class AccountDTO {
        @Pattern(regexp = "^(03|05|07|08|09)[0-9]{8}$", message = "Your phone number is not valid")
        private String phoneNumber;
 
-       @Pattern(regexp = "^(ROLE_ADMIN|ROLE_USER)", message = "value must be ROLE_ADMIN or ROLE_USER")
+       @Pattern(regexp = "^(ROLE_ADMIN|ROLE_USER|ROLE_MANAGER|ROLE_STAFF)", message = "value must be 'ROLE_ADMIN', 'ROLE_USER', 'ROLE_MANAGER' or  'ROLE_STAFF' ")
        private String role;
 
        @NotNull(message = "Block status cannot be null")
@@ -44,9 +48,17 @@ public class AccountDTO {
        public AccountDTO() {
        }
 
-       public AccountDTO(String userName, String passWord, String email, String fullName, String phoneNumber, String role,
-                     Boolean isBlock, Boolean isDelete, List<Long> listFeedbackEntities_Id,
-                     List<Long> listTicketEntities_Id) {
+       public AccountDTO(
+                     @NotBlank(message = "Cannot be left blank !") @Size(max = 20, min = 5, message = "Account username must be at least 5 characters and at most 20 characters") String userName,
+                     @NotBlank(message = "Cannot be left blank !") @Size(min = 5, message = "Must be 5 characters long more") String passWord,
+                     @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@(gmail|outlook)\\.com$", message = "You need to enter your gmail or outlook address") String email,
+                     @NotBlank(message = "Cannot be left blank !") String fullName,
+                     @Pattern(regexp = "^(03|05|07|08|09)[0-9]{8}$", message = "Your phone number is not valid") String phoneNumber,
+                     @Pattern(regexp = "^(ROLE_ADMIN|ROLE_USER|ROLE_MANAGER|ROLE_STAFF)", message = "value must be 'ROLE_ADMIN', 'ROLE_USER', 'ROLE_MANAGER' or  'ROLE_STAFF' ") String role,
+                     @NotNull(message = "Block status cannot be null") Boolean isBlock,
+                     @NotNull(message = "Delete status cannot be null") Boolean isDelete,
+                     @NotNull(message = "Feedback entity IDs cannot be null") List<Long> listFeedbackEntities_Id,
+                     @NotNull(message = "Ticket entity IDs cannot be null") List<Long> listTicketEntities_Id) {
               this.userName = userName;
               this.passWord = passWord;
               this.email = email;
@@ -58,8 +70,6 @@ public class AccountDTO {
               this.listFeedbackEntities_Id = listFeedbackEntities_Id;
               this.listTicketEntities_Id = listTicketEntities_Id;
        }
-
-       
 
        public String getUserName() {
               return userName;

@@ -7,3 +7,4 @@ export * from './feedbackService';
 export * from './paymentService';
 export * from './penaltyTicketService';
 export * from './ticketService';
+export * from './tripService';

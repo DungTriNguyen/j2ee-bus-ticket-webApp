@@ -10,14 +10,13 @@ import jakarta.persistence.Index;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
-
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @Entity
 @Table(name = "bus_routes", indexes = @Index(columnList = "routes_id"))
 public class BusRoutesEntity {
-       
+
        @Id
        @GeneratedValue(strategy = GenerationType.IDENTITY)
        @Column(name = "routes_id")
@@ -32,11 +31,8 @@ public class BusRoutesEntity {
        @Column(name = "distance_location", columnDefinition = "FLOAT", length = 5)
        private float distanceKilometer;
 
-       @Column(name = "departure_time", columnDefinition = "DATETIME")
-       private LocalDateTime departureTime;
-
-       @Column(name = "arival_time", columnDefinition = "DATETIME")
-       private LocalDateTime arivalTime;
+       @Column(name = "trip_time", columnDefinition = "TIME")
+       private LocalTime tripTime;
 
        @Column(name = "price", columnDefinition = "FLOAT", length = 5)
        private float price;
@@ -44,24 +40,24 @@ public class BusRoutesEntity {
        @Column(name = "is_delete", nullable = false, columnDefinition = "BOOLEAN DEFAULT false")
        private Boolean isDelete;
 
+       // @OneToMany(mappedBy = "busRoutesEntity", fetch = FetchType.LAZY)
+       // private List<TicketEntity> listTicketEntities;
+
        @OneToMany(mappedBy = "busRoutesEntity", fetch = FetchType.LAZY)
-       private List<TicketEntity> listTicketEntities;
-
-
-       public BusRoutesEntity() {
-       }
+       private List<BusRouteScheduleEntity> listBusRouteSchedules;
 
        public BusRoutesEntity(String departureLocation, String destinationLocation, float distanceKilometer,
-                     LocalDateTime departureTime, LocalDateTime arivalTime, float price, Boolean isDelete,
-                     List<TicketEntity> listTicketEntities) {
+                     LocalTime tripTime, float price, Boolean isDelete, List<BusRouteScheduleEntity> listBusRouteSchedules) {
               this.departureLocation = departureLocation;
               this.destinationLocation = destinationLocation;
               this.distanceKilometer = distanceKilometer;
-              this.departureTime = departureTime;
-              this.arivalTime = arivalTime;
+              this.tripTime = tripTime;
               this.price = price;
               this.isDelete = isDelete;
-              this.listTicketEntities = listTicketEntities;
+              this.listBusRouteSchedules = listBusRouteSchedules;
+       }
+
+       public BusRoutesEntity() {
        }
 
        public Long getRoutesId() {
@@ -96,22 +92,6 @@ public class BusRoutesEntity {
               this.distanceKilometer = distanceKilometer;
        }
 
-       public LocalDateTime getDepartureTime() {
-              return departureTime;
-       }
-
-       public void setDepartureTime(LocalDateTime departureTime) {
-              this.departureTime = departureTime;
-       }
-
-       public LocalDateTime getArivalTime() {
-              return arivalTime;
-       }
-
-       public void setArivalTime(LocalDateTime arivalTime) {
-              this.arivalTime = arivalTime;
-       }
-
        public float getPrice() {
               return price;
        }
@@ -128,13 +108,20 @@ public class BusRoutesEntity {
               this.isDelete = isDelete;
        }
 
-       public List<TicketEntity> getListTicketEntities() {
-              return listTicketEntities;
+       public LocalTime getTripTime() {
+              return tripTime;
        }
 
-       public void setListTicketEntities(List<TicketEntity> listTicketEntities) {
-              this.listTicketEntities = listTicketEntities;
+       public void setTripTime(LocalTime tripTime) {
+              this.tripTime = tripTime;
        }
 
-       
+       public List<BusRouteScheduleEntity> getListBusRouteSchedules() {
+              return listBusRouteSchedules;
+       }
+
+       public void setListBusRouteSchedules(List<BusRouteScheduleEntity> listBusRouteSchedules) {
+              this.listBusRouteSchedules = listBusRouteSchedules;
+       }
+
 }

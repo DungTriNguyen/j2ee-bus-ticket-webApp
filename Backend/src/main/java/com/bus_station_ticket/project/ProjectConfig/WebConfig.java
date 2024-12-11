@@ -1,10 +1,8 @@
 package com.bus_station_ticket.project.ProjectConfig;
 
-
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
-
 
 import io.micrometer.common.lang.NonNull;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,29 +13,24 @@ public class WebConfig implements CorsConfigurationSource {
 
        @Override
        @NonNull
-       public CorsConfiguration getCorsConfiguration(@SuppressWarnings("null") HttpServletRequest request) {
+       public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
               CorsConfiguration config = new CorsConfiguration();
 
               // Cấu hình allowed origins
-              config.setAllowedOrigins(Arrays.asList(
-                            "http://localhost:5173", // Frontend React
-                            "http://localhost:3000",
-                            "http://localhost:8080" // Backend Spring Boot (nếu cần)
-              ));
+              // config.setAllowedOrigins(Arrays.asList(
+              // "http://localhost:5173", // Frontend React
+              // "http://localhost:3000",
+              // "http://localhost:8080" // Backend Spring Boot (nếu cần)
+              // ));
+
+              config.addAllowedOriginPattern("*"); // Nếu dùng setAllowCredentials(true)
 
               // Cấu hình allowed methods
               config.setAllowedMethods(Arrays.asList(
                             "GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
 
               // Cấu hình allowed headers
-              config.setAllowedHeaders(Arrays.asList(
-                            "Origin",
-                            "Content-Type",
-                            "Accept",
-                            "Authorization",
-                            "Access-Control-Allow-Origin",
-                            "Access-Control-Allow-Credentials",
-                            "X-Requested-With"));
+              config.setAllowedHeaders(Arrays.asList("*"));
 
               // Cho phép gửi cookie và credentials
               config.setAllowCredentials(true);
